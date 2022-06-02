@@ -4,7 +4,7 @@ const service = mqtt.connect('mqtt://127.0.0.1', options)
 const args = process.argv.slice(2);
 const { MyDatabase, Service } = require('./MyService.js');
 
-let status = []; //lock
+let status = []; //lock -> 1:unlock 0:lock
 let serviceNum = args[0]; //args[0] <- service 編號
 let itemNum = args[1];
 //args[1] <- item數量
@@ -15,7 +15,7 @@ const serviceAction = function (payload, db) {
         console.log("===============");
         console.log("query from client " + payload.clientId);
 
-        //check row status of db
+        //check row status of db -> 0:prepare / -1:abort / 1:commit
         if (status[payload.payload[1]].status === 1 && args[2] === 'confirm') {////////!!!!!!!!!!!!!!!!!!
             var sqlInsert = 'INSERT INTO TxLog(TID,Item,Num,Status,ClientID) VALUES (?,?,?,?,?)';
             db.run(sqlInsert, [payload.tId, payload.payload[1], payload.payload[0], 0, payload.clientId]);
@@ -137,7 +137,7 @@ for (var i = 0; i < itemNum; i++) {
     let o1 = {
         id: i,
         clientId: "",
-        status: 1 //status-> 1:unlock 0:lock
+        status: 1 
     };
     status.push(o1);
 }
