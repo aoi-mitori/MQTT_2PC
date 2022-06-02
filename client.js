@@ -13,11 +13,9 @@ let accessSameRowNum = args[1]; //args[1] <- 有多少client access同一個row
 let serviceNum = args[2]; //args[2] <- service數量
 let buyItem = parseInt(clientNum); //buyItem:在資料庫access的item編號（access的row）
 if (parseInt(clientNum) < parseInt(accessSameRowNum) ) {
-    
     buyItem = 0; //編號在accessSameRowNum之前的都去access第0個row
 }
-console.log(clientNum, accessSameRowNum, buyItem);
-//writeIntoLog(fs, toString(buyItem)+"\n");
+
 let logFilePath = './log/client' + clientNum + '.txt'; //log檔路徑
 let timeFilePath = './log/time.txt'; //time.txt路徑（記錄時間）
 
@@ -26,10 +24,11 @@ let services = {
     responseTopics: []
 };
 
+// services data (topic and response topic)
 for (var i = 0; i < serviceNum; i++) {
     services.topics.push("Topic" + i); //設定為service的topic
     services.responseTopics.push("ResponseTopic" + i + clientNum); //each client should have its own responseTopic
-} // services data (topic and response topic)
+} 
 
 function _uuid() {
     var d = Date.now();
@@ -95,10 +94,9 @@ client.on('connect', function () {
         options,
         function (err, granted) { }
     )
-    let tid = uuid + Math.random(); //part of transaction id
+    let tid = uuid + Math.random(); // transaction id
 
     writeIntoTime( fs, performance.timeOrigin + performance.now() );
-    //writeIntoTime(fs,"test");
 
     client.publish(
         services.topics[0],
@@ -131,7 +129,7 @@ client.on('packetreceive', function (packet) {
                         options,
                         function (err, granted) { }
                     )
-                    let tid = uuid + Math.random(); //part of transaction id
+                    let tid = uuid + Math.random(); //transaction id
                     client.publish( //query next service
                         services.topics[nextServiceNum],
                         createMessage("query", services.responseTopics[nextServiceNum], tid),
